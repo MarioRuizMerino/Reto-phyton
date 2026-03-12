@@ -7,9 +7,9 @@ app = Ursina()
 # Suelo amplio
 ground = Entity(
     model='assets/Laberinto.obj',
-    scale=1,
+    scale=0.5,
     texture='assets/textura-pared.jpeg',
-    position=(0,0,0),
+    position=(-17.5,0,-16.5),
 #    texture_scale=(100, 100),
     collider='mesh',
 #    color=color.rgb(50,150,50)
