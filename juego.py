@@ -6,11 +6,12 @@ app = Ursina()
 
 # Suelo amplio
 ground = Entity(
-    model='plane',
-    scale=(200, 1, 200),
-    texture='white_cube',
+    model='assets/Laberinto.obj',
+    scale=1,
+    texture='black_cube',
+    position=(0,0,0),
     texture_scale=(100, 100),
-    collider='box',
+    collider='mesh',
     color=color.rgb(50,150,50)
 )
 
