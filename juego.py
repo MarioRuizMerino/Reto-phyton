@@ -8,11 +8,11 @@ app = Ursina()
 ground = Entity(
     model='assets/Laberinto.obj',
     scale=1,
-    texture='black_cube',
+    texture='assets/textura-pared.jpeg',
     position=(0,0,0),
-    texture_scale=(100, 100),
+#    texture_scale=(100, 100),
     collider='mesh',
-    color=color.rgb(50,150,50)
+#    color=color.rgb(50,150,50)
 )
 
 # # Pequeñas montañas/colinas con cubos para dar relieve
@@ -33,7 +33,7 @@ Sky()
 
 # Jugador: controlador en primera persona (WASD + ratón)
 player = FirstPersonController()
-player.speed = 5
+player.speed = 8
 
 # Menú de pausa (Escape): panel con botones para continuar o salir
 menu = Entity(parent=camera.ui, model='quad', scale=(0.5, 0.45), color=color.rgba(0, 0, 0, 190), enabled=False)
