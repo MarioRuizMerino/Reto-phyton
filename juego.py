@@ -14,6 +14,14 @@ ground = Entity(
     collider='mesh',
 #    color=color.rgb(50,150,50)
 )
+cristal = Entity(
+    model='assets/cristal.obj',
+    scale=0.5,
+    position=(-17.5,0,-16.5),
+    collider='mesh',
+    color=color.rgba(180,220,255,120)
+)
+cristal.alpha = 0.2
 
 # # Pequeñas montañas/colinas con cubos para dar relieve
 # for x in range(-20, 21, 4):
