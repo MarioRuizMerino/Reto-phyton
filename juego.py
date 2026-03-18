@@ -4,7 +4,7 @@ from ursina.prefabs.first_person_controller import FirstPersonController
 app = Ursina()
 
 # Suelo amplio
-ground = Entity(
+laberinto = Entity(
     model='assets/laberinto.obj',
     scale=0.5,
     texture='assets/textura-pared.jpeg',
@@ -36,6 +36,13 @@ paredes = Entity(
     collider='mesh'
 )
 paredes.alpha = 0.00001
+
+palanca = Entity(
+    model='palanca1.obj',
+    position=(-3.66, -3.5, -1.71),
+    scale=0.5,
+    collider='mesh'
+)
 
 Sky()
 
@@ -90,9 +97,10 @@ pos_text = Text(
     color=color.cyan,
     background=True,
 )
+activada = False
 
 def update():
-    global collected
+    global collected, activada
     for ball in balls[:]:          # copia para poder modificar la lista
         if ball.enabled and distance(player, ball) < 1.2:
             ball.enabled = False
@@ -102,6 +110,10 @@ def update():
             if collected == total:
                 counter_text.text = '¡Has recogido todas las bolas!'
     pos_text.text = f'X: {player.x:.2f}  Y: {player.y:.2f}  Z: {player.z:.2f}'
+    if distance(player, palanca) < 1.2 and not activada:
+        palanca.model = 'palanca.obj'
+        activada = True
+        destroy(cristal)
 
 # ──────────────────────────────────────────────
 # MENÚ DE PAUSA
