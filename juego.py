@@ -39,7 +39,28 @@ paredes.alpha = 0.00001
 
 palanca = Entity(
     model='palanca1.obj',
-    position=(-3.66, -3.5, -1.71),
+    position=(0.30, -4.48, -2.2),
+    scale=0.5,
+    collider='mesh'
+)
+
+tp1 = Entity(
+    model='teletransportador.obj',
+    position=(-5.58, -4.48, 9.36),
+    scale=0.5,
+    collider='mesh'
+)
+
+parkour = Entity(
+    model='parkour.obj',
+    position=(10, 10, 20),
+    scale=0.3,
+    collider='mesh'
+)
+
+tp2 = Entity(
+    model='teletransportador.obj',
+    position=(10, 10.2, 55.57),
     scale=0.5,
     collider='mesh'
 )
@@ -60,7 +81,7 @@ BALL_POSITIONS = [
     (-5,  1,  -35),
     (-34,  1, -34),
     (-34,   1, 4),
-    (-1, 1, -1),
+    (9.8, 11, 37.71),
 ]
 
 balls = []
@@ -90,6 +111,8 @@ counter_text = Text(
     color=color.white,
     background=True,
 )
+"""
+Coordenadas
 pos_text = Text(
     text='X: 0.00  Y: 0.00  Z: 0.00',
     position=(-0.85, 0.38),
@@ -97,6 +120,7 @@ pos_text = Text(
     color=color.cyan,
     background=True,
 )
+"""
 activada = False
 
 def update():
@@ -109,11 +133,22 @@ def update():
             counter_text.text = f'Bolas: {collected} / {total}'
             if collected == total:
                 counter_text.text = '¡Has recogido todas las bolas!'
-    pos_text.text = f'X: {player.x:.2f}  Y: {player.y:.2f}  Z: {player.z:.2f}'
+
+    #Coordenadas en pantalla
+    #pos_text.text = f'X: {player.x:.2f}  Y: {player.y:.2f}  Z: {player.z:.2f}'
+
     if distance(player, palanca) < 1.2 and not activada:
         palanca.model = 'palanca.obj'
         activada = True
         destroy(cristal)
+
+        # Teletransportador 1 → zona parkour
+    if distance(player, tp1) < 1.5:
+        player.position = Vec3(10, 10.5, 20)
+
+        # Teletransportador 2 → origen
+    if distance(player, tp2) < 1.5:
+        player.position = Vec3(0, 0, 0)
 
 # ──────────────────────────────────────────────
 # MENÚ DE PAUSA
@@ -126,10 +161,17 @@ menu = Entity(
     enabled=False,
 )
 Text('Pausa', parent=menu, y=0.2, scale=2, color=color.white)
-resume_btn = Button(text='Continuar', parent=menu, scale=(0.6, 0.12), y=0.04)
-quit_btn   = Button(text='Salir',     parent=menu, scale=(0.6, 0.12), y=-0.14)
+resume_btn = Button(text='Continuar', parent=menu, scale=(0.6, 0.12), y=0.20)
+respawn_btn = Button(text='Respawn', parent=menu, scale=(0.6, 0.12), y=-0.0)
+quit_btn   = Button(text='Salir',     parent=menu, scale=(0.6, 0.12), y=-0.2)
 
 def resume():
+    menu.enabled = False
+    player.enabled = True
+    mouse.locked = True
+
+def respawn():
+    player.position = Vec3(0, 0, 0)
     menu.enabled = False
     player.enabled = True
     mouse.locked = True
@@ -138,6 +180,7 @@ def quit_game():
     application.quit()
 
 resume_btn.on_click = resume
+respawn_btn.on_click = respawn
 quit_btn.on_click   = quit_game
 
 def input(key):
