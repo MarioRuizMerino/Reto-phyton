@@ -1,5 +1,6 @@
 from ursina import *
 from ursina.prefabs.first_person_controller import FirstPersonController
+import math
 
 app = Ursina()
 
@@ -65,6 +66,49 @@ tp2 = Entity(
     collider='mesh'
 )
 
+
+menu_activo = True
+camera_angle = 0
+
+# Cámara cenital animada
+camera.position = (0, 30, 0)
+camera.rotation = (90, 0, 0)
+
+main_menu = Entity(parent=camera.ui)
+
+titulo = Text(
+    'LABERINTO',
+    parent=main_menu,
+    scale=4,
+    y=0.35,
+    color=color.white,
+    origin=(0, 0),
+)
+subtitulo = Text(
+    'encuentra todas las bolas',
+    parent=main_menu,
+    scale=1.5,
+    y=0.22,
+    color=color.cyan,
+    origin=(0, 0),
+)
+
+play_btn = Button(
+    text='Jugar',
+    parent=main_menu,
+    scale=(0.35, 0.1),
+    y=0.0,
+    color=color.azure,
+)
+quit_btn_main = Button(
+    text='Salir',
+    parent=main_menu,
+    scale=(0.35, 0.1),
+    y=-0.15,
+    color=color.dark_gray,
+)
+
+
 Sky()
 
 
@@ -110,6 +154,7 @@ counter_text = Text(
     scale=2,
     color=color.white,
     background=True,
+    enabled=False
 )
 """
 Coordenadas
@@ -124,8 +169,20 @@ pos_text = Text(
 activada = False
 
 def update():
-    global collected, activada
-    for ball in balls[:]:          # copia para poder modificar la lista
+    global collected, activada, camera_angle, menu_activo
+
+    # ── Cámara volando sobre el mapa en el menú ──
+    if menu_activo:
+        camera_angle += time.dt * 10          # velocidad de rotación
+        r = 25                                 # radio del círculo
+        camera.x = math.sin(math.radians(camera_angle)) * r
+        camera.z = math.cos(math.radians(camera_angle)) * r
+        camera.y = 30
+        camera.look_at(Vec3(-5, 0, -5))        # siempre mira al centro
+        return                                 # no ejecuta el resto del juego
+
+    # ── Lógica del juego ──
+    for ball in balls[:]:
         if ball.enabled and distance(player, ball) < 1.2:
             ball.enabled = False
             balls.remove(ball)
@@ -142,14 +199,11 @@ def update():
         activada = True
         destroy(cristal)
 
-        # Teletransportador 1 → zona parkour
     if distance(player, tp1) < 1.5:
-        player.position = Vec3(10, 10.5, 20)
+        player.position = Vec3(10, 10, 20)
 
-        # Teletransportador 2 → origen
     if distance(player, tp2) < 1.5:
         player.position = Vec3(0, 0, 0)
-
 # ──────────────────────────────────────────────
 # MENÚ DE PAUSA
 # ──────────────────────────────────────────────
@@ -184,10 +238,31 @@ respawn_btn.on_click = respawn
 quit_btn.on_click   = quit_game
 
 def input(key):
+    if menu_activo:
+        return
     if key == 'escape':
         menu.enabled = not menu.enabled
         player.enabled = not menu.enabled
         mouse.locked = not menu.enabled
+
+
+def start_game():
+    global menu_activo
+    menu_activo = False
+    main_menu.enabled = False
+    # Restaura cámara al jugador
+    camera.position = (0, 0, 0)
+    camera.rotation = (0, 0, 0)
+    player.enabled = True
+    mouse.locked = True
+    counter_text.enabled = True
+
+
+def quit_main():
+    application.quit()
+
+play_btn.on_click = start_game
+quit_btn_main.on_click = quit_main
 
 
 # Jugador
@@ -195,6 +270,7 @@ player = FirstPersonController()
 player.speed = 8
 player.collider = ('capsule')
 player.continuous_collision = True
+player.enabled = False
+mouse.locked = False
 
-mouse.locked = True
 app.run()
